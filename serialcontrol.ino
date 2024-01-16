@@ -76,6 +76,9 @@ void connectToWiFi() {
   while (1) {
     if (Serial.available() > 0) {
       int selectedNetwork = Serial.parseInt();
+      Serial.print("You selected: ");
+      Serial.println(selectedNetwork);  // Add this line for debugging
+
       if (selectedNetwork >= 1 && selectedNetwork <= numNetworks) {
         WiFiCredentials credentials;
 
@@ -104,12 +107,21 @@ void connectToWiFi() {
         }
 
         WiFi.begin(credentials.ssid, credentials.password);
+        int attempts = 0;
         while (WiFi.status() != WL_CONNECTED) {
           delay(1000);
           Serial.print(".");
+          attempts++;
+          if (attempts > 30) {  // Allow a maximum of 30 seconds for connection
+            Serial.println("\nFailed to connect to Wi-Fi. Please check your credentials.");
+            break;
+          }
         }
 
-        Serial.println("\nConnected to Wi-Fi!");
+        if (WiFi.status() == WL_CONNECTED) {
+          Serial.println("\nConnected to Wi-Fi!");
+        }
+
         break;
       } else {
         Serial.println("Invalid selection. Enter the number corresponding to the desired Wi-Fi network:");

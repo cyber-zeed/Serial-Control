@@ -31,6 +31,9 @@ void setup() {
 
 void loop() {
   server.handleClient();
+
+  // Check for serial commands
+  checkSerialCommands();
 }
 
 void connectToWiFi() {
@@ -60,7 +63,8 @@ void handleRoot() {
 
   for (int i = 0; i < numPins; i++) {
     html += "<button onclick=\"window.location.href='/on?pin=" + String(pins[i]) + "'\">Port " + String(pins[i]) + " On</button>";
-    html += "<button onclick=\"window.location.href='/off?pin=" + String(pins[i]) + "'\">Port " + String(pins[i]) + " Off</button><br>";
+    html += "<button onclick=\"window.location.href='/off?pin=" + String(pins[i]) + "'\">Port " + String(pins[i]) + " Off</button>";
+    html += "<span id=\"status" + String(pins[i]) + "\">" + (digitalRead(pins[i]) ? " ON" : " OFF") + "</span><br>";
   }
 
   html += "</body></html>";
@@ -71,10 +75,35 @@ void handleOn() {
   String pin = server.arg("pin");
   digitalWrite(pin.toInt(), HIGH);
   server.send(200, "text/plain", "Port " + pin + " turned ON");
+  updateStatus(pin.toInt(), "ON");
 }
 
 void handleOff() {
   String pin = server.arg("pin");
   digitalWrite(pin.toInt(), LOW);
   server.send(200, "text/plain", "Port " + pin + " turned OFF");
+  updateStatus(pin.toInt(), "OFF");
+}
+
+void updateStatus(int pin, const char *status) {
+  server.send(200, "text/plain", status);
+  server.sendContent("application/javascript",
+                     "document.getElementById('status" + String(pin) + "').innerHTML = '" + status + "';");
+}
+
+void checkSerialCommands() {
+  while (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+
+    if (command.startsWith("on")) {
+      int pin = command.substring(2).toInt();
+      digitalWrite(pin, HIGH);
+      updateStatus(pin, "ON");
+    } else if (command.startsWith("off")) {
+      int pin = command.substring(3).toInt();
+      digitalWrite(pin, LOW);
+      updateStatus(pin, "OFF");
+    }
+  }
 }

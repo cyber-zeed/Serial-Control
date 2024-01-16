@@ -90,8 +90,8 @@ void handleOff() {
 
 void updateStatus(int pin, const char *status) {
   server.send(200, "text/plain", status);
-  server.sendContent("application/javascript",
-                     "document.getElementById('status" + String(pin) + "').innerHTML = '" + status + "';");
+  server.send(200, "application/javascript",
+              "document.getElementById('status" + String(pin) + "').innerHTML = '" + status + "';");
 }
 
 void checkSerialCommands() {

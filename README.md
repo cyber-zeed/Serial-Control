@@ -1,62 +1,57 @@
-# Serial-Control
-Simple Arduino File to control pins over serial and Wi-Fi
+Description:
 
-Step 1: Install the Required Libraries
-Make sure you have the necessary libraries installed in your Arduino IDE.
+This ESP8266-based project creates a simple web server that allows you to control GPIO pins using buttons on a webpage. The web server displays buttons for each GPIO pin, allowing you to turn them ON or OFF. Additionally, you can control the pins via serial commands.
 
-ESP8266 Board Support: Install the ESP8266 board support using the Arduino Board Manager. Go to Tools -> Board -> Boards Manager, search for "esp8266," and install the package.
+Step-by-Step Guide:
 
-ESP8266 Libraries: Make sure you have the following libraries installed:
+1. Set up Arduino IDE:
+Ensure that you have the Arduino IDE installed on your computer.
 
-ESP8266WiFi: This is included in the ESP8266 board support package.
-ESP8266WebServer: This is included in the ESP8266 board support package.
-EEPROM: Included in the Arduino IDE by default.
-Step 2: Open the Arduino IDE
-Open the Arduino IDE on your computer.
+3. Install ESP8266 Board Support:
+Open Arduino IDE.
+Go to "File" -> "Preferences."
+In the "Additional Boards Manager URLs" field, add the following URL: http://arduino.esp8266.com/stable/package_esp8266com_index.json
+Click "OK" to close the Preferences window.
+Go to "Tools" -> "Board" -> "Boards Manager."
+Search for "esp8266" and install the "esp8266" platform by ESP8266 Community.
 
-Step 3: Create a New Sketch
-Create a new sketch by selecting File -> New.
+4. Install Required Libraries:
+Go to "Sketch" -> "Include Library" -> "Manage Libraries..."
+Install the "ESP8266WiFi" and "ESP8266WebServer" libraries.
 
-Step 4: Copy and Paste the Code
-Copy the entire code provided in the previous messages and paste it into your new Arduino sketch.
+5. Connect ESP8266:
+Connect your ESP8266 module to your computer using a USB-to-Serial adapter.
 
-Step 5: Configure GPIO Pins
-Adjust the pins array in the code to match the GPIO pins you want to control. Ensure that these pins are suitable for your specific ESP8266 board and connected devices.
+6. Configure Wi-Fi:
+Open the provided code in the Arduino IDE.
+Replace "your_wifi_ssid" and "your_wifi_password" with your actual Wi-Fi credentials.
 
-Default Pins
+7. Upload Code:
+Select your ESP8266 board from "Tools" -> "Board" menu.
+Choose the appropriate COM port from "Tools" -> "Port" menu.
+Click the "Upload" button to upload the code to your ESP8266.
 
-int pins[numPins] = {0, 2, 4, 5, 12, 13, 14, 15, 16};  // GPIO pins to control
+8. Open Serial Monitor:
+After uploading, open the Serial Monitor from "Tools" -> "Serial Monitor."
+Set the baud rate to 115200.
 
+9. Connect to Wi-Fi:
+In the Serial Monitor, you will see the ESP8266 attempting to connect to Wi-Fi.
+Once connected, it will display "Connected to Wi-Fi!"
 
-Step 6: Connect ESP8266 to Computer
-Connect your ESP8266 board to your computer using a USB cable.
+10. Access Webpage:
+Open a web browser and enter the IP address shown in the Serial Monitor (e.g., http://192.168.1.100).
+The webpage displays buttons for each GPIO pin.
 
-Step 7: Select Board and Port
-In the Arduino IDE, go to Tools -> Board and select your ESP8266 board model. Also, select the appropriate port under Tools -> Port.
+11. Control GPIO Pins:
+Click the "ON" or "OFF" buttons next to each GPIO pin on the webpage to control the corresponding pin.
+The status of each pin is updated on the webpage in real-time.
 
-Step 8: Upload the Code
-Click the "Upload" button (right arrow icon) to upload the code to your ESP8266 board. This may take a few moments.
+12. Control via Serial:
+In the Serial Monitor, type commands like "on5" or "off5" and press Enter to control GPIO pin 5.
+The status will be updated in the Serial Monitor and on the webpage.
 
-Step 9: Open Serial Monitor
-Once the code is uploaded, open the Serial Monitor in the Arduino IDE (Tools -> Serial Monitor). You should see the serial output from your ESP8266.
-
-Step 10: Interact with the Application
-Follow the prompts in the Serial Monitor to interact with the application. The ESP8266 will scan for available Wi-Fi networks, and you can input the number corresponding to your desired network. If needed, provide Wi-Fi passwords and observe the connection process.
-
-Step 11: Control GPIO Pins via Web Server
-Once connected, open a web browser and enter the IP address of your ESP8266. You should see a webpage with buttons to control the GPIO pins.
-
-Click the buttons to turn the GPIO pins on and off.
-
-Step 12: Test EEPROM Storage
-If you connect to new Wi-Fi networks, observe how the ESP8266 stores and reuses Wi-Fi credentials using EEPROM emulation.
-
-Step 13: Troubleshoot (If Needed)
-If you encounter any issues, check the Serial Monitor for error messages. Ensure that your Wi-Fi network details and GPIO pin configurations are correct.
-
-Note:
-Remember to replace placeholder values in the code (e.g., Wi-Fi SSID and password) with your actual information.
-Be cautious when handling GPIO pins to avoid damage to your ESP8266 or connected devices.
-This step-by-step tutorial assumes a basic understanding of using the Arduino IDE and programming ESP8266. 
-
-
+Notes:
+GPIO pin 0 is excluded from the webpage as it is a special pin on the ESP8266.
+The webpage dynamically updates without refreshing when buttons are pressed.
+By following these steps, you should be able to set up and use the ESP8266-based web server with serial command control.

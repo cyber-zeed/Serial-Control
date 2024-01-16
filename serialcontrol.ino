@@ -34,6 +34,9 @@ void loop() {
 
   // Check for serial commands
   checkSerialCommands();
+
+  // Print the status of buttons every second
+  printButtonStatus();
 }
 
 void connectToWiFi() {
@@ -74,15 +77,15 @@ void handleRoot() {
 void handleOn() {
   String pin = server.arg("pin");
   digitalWrite(pin.toInt(), HIGH);
-  server.send(200, "text/plain", "Port " + pin + " turned ON");
   updateStatus(pin.toInt(), "ON");
+  Serial.println("Port " + pin + " turned ON");
 }
 
 void handleOff() {
   String pin = server.arg("pin");
   digitalWrite(pin.toInt(), LOW);
-  server.send(200, "text/plain", "Port " + pin + " turned OFF");
   updateStatus(pin.toInt(), "OFF");
+  Serial.println("Port " + pin + " turned OFF");
 }
 
 void updateStatus(int pin, const char *status) {
@@ -100,10 +103,24 @@ void checkSerialCommands() {
       int pin = command.substring(2).toInt();
       digitalWrite(pin, HIGH);
       updateStatus(pin, "ON");
+      Serial.println("Port " + String(pin) + " turned ON");
     } else if (command.startsWith("off")) {
       int pin = command.substring(3).toInt();
       digitalWrite(pin, LOW);
       updateStatus(pin, "OFF");
+      Serial.println("Port " + String(pin) + " turned OFF");
+    }
+  }
+}
+
+void printButtonStatus() {
+  static unsigned long lastPrintTime = 0;
+  if (millis() - lastPrintTime >= 1000) {  // Print every second
+    lastPrintTime = millis();
+    Serial.println("\nButton Status:");
+    for (int i = 0; i < numPins; i++) {
+      Serial.print("Port " + String(pins[i]) + ": ");
+      Serial.println(digitalRead(pins[i]) ? "ON" : "OFF");
     }
   }
 }

@@ -9,11 +9,6 @@ ESP8266WebServer server(80);
 
 const int EEPROM_SIZE = 512;  // EEPROM size on ESP8266
 
-struct WiFiCredentials {
-  char ssid[32];
-  char password[64];
-};
-
 void setup() {
   Serial.begin(115200);
 
@@ -56,57 +51,28 @@ void connectToWiFi() {
     Serial.println(WiFi.SSID(i));
   }
 
-  WiFiCredentials lastCredentials[10];
-
-  // Read the last 10 stored Wi-Fi credentials from EEPROM
-  for (int i = 0; i < 10; i++) {
-    EEPROM.get(i * sizeof(WiFiCredentials), lastCredentials[i]);
-  }
-
-  Serial.println("\nSelect a Wi-Fi network:");
-
-  for (int i = 0; i < numNetworks; i++) {
-    Serial.print(i + 1);
-    Serial.print(": ");
-    Serial.println(WiFi.SSID(i));
-  }
-
   Serial.println("\nEnter the number corresponding to the desired Wi-Fi network:");
 
   while (1) {
     if (Serial.available() > 0) {
       int selectedNetwork = Serial.parseInt();
       Serial.print("You selected: ");
-      Serial.println(selectedNetwork);  // Add this line for debugging
+      Serial.println(selectedNetwork);
 
       if (selectedNetwork >= 1 && selectedNetwork <= numNetworks) {
-        WiFiCredentials credentials;
+        Serial.print("Connecting to ");
+        Serial.println(WiFi.SSID(selectedNetwork - 1));
 
-        // Check if the selected Wi-Fi network has stored credentials
-        if (selectedNetwork <= 10 && selectedNetwork <= numNetworks) {
-          credentials = lastCredentials[selectedNetwork - 1];
-          Serial.println("Connecting to the known Wi-Fi network...");
-        } else {
-          Serial.print("Connecting to ");
-          Serial.println(WiFi.SSID(selectedNetwork - 1));
-
-          // Prompt for Wi-Fi password
-          Serial.println("Enter the Wi-Fi password:");
-          while (!Serial.available()) {
-            delay(100);
-          }
-          String password = Serial.readStringUntil('\n');
-          password.trim();
-
-          strncpy(credentials.ssid, WiFi.SSID(selectedNetwork - 1).c_str(), sizeof(credentials.ssid));
-          strncpy(credentials.password, password.c_str(), sizeof(credentials.password));
-
-          // Overwrite the oldest stored credentials
-          EEPROM.put((selectedNetwork % 10) * sizeof(WiFiCredentials), credentials);
-          Serial.println("Credentials saved for the next connection.");
+        // Prompt for Wi-Fi password
+        Serial.println("Enter the Wi-Fi password:");
+        while (!Serial.available()) {
+          delay(100);
         }
+        String password = Serial.readStringUntil('\n');
+        password.trim();
 
-        WiFi.begin(credentials.ssid, credentials.password);
+        WiFi.begin(WiFi.SSID(selectedNetwork - 1).c_str(), password.c_str());
+
         int attempts = 0;
         while (WiFi.status() != WL_CONNECTED) {
           delay(1000);

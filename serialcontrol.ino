@@ -4,7 +4,7 @@
 const char *ssid = "your_wifi_ssid";
 const char *password = "your_wifi_password";
 
-const int numPins = 11;  // Number of GPIO pins available on ESP8266
+const int numPins = 10;  // Number of GPIO pins available on ESP8266
 int pins[numPins] = {0, 2, 4, 5, 12, 13, 14, 15, 16};  // GPIO pins to control
 
 ESP8266WebServer server(80);
@@ -64,15 +64,20 @@ void handleRoot() {
   html += "<h1>ESP8266 Web Server</h1>";
   html += "<p>Click the buttons to control the ports:</p>";
 
-  for (int i = 0; i < numPins; i++) {
-    html += "<button onclick=\"sendCommand('/on?pin=" + String(pins[i]) + "')\">Port " + String(pins[i]) + " On</button>";
-    html += "<button onclick=\"sendCommand('/off?pin=" + String(pins[i]) + "')\">Port " + String(pins[i]) + " Off</button>";
+  for (int i = 1; i < numPins; i++) {  // Start from pin 1
+    html += "<button onclick=\"sendCommand('/on?pin=" + String(pins[i]) + "', " + String(pins[i]) + ")\">Port " + String(pins[i]) + " On</button>";
+    html += "<button onclick=\"sendCommand('/off?pin=" + String(pins[i]) + "', " + String(pins[i]) + ")\">Port " + String(pins[i]) + " Off</button>";
     html += "<span id=\"status" + String(pins[i]) + "\">" + (digitalRead(pins[i]) ? " ON" : " OFF") + "</span><br>";
   }
 
   html += "<script>";
-  html += "function sendCommand(url) {";
+  html += "function sendCommand(url, pin) {";
   html += "  var xhr = new XMLHttpRequest();";
+  html += "  xhr.onreadystatechange = function() {";
+  html += "    if (xhr.readyState == 4 && xhr.status == 200) {";
+  html += "      document.getElementById('status' + pin).innerHTML = xhr.responseText;";
+  html += "    }";
+  html += "  };";
   html += "  xhr.open('GET', url, true);";
   html += "  xhr.send();";
   html += "}";

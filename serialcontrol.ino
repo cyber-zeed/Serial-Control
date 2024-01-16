@@ -65,10 +65,18 @@ void handleRoot() {
   html += "<p>Click the buttons to control the ports:</p>";
 
   for (int i = 0; i < numPins; i++) {
-    html += "<button onclick=\"window.location.href='/on?pin=" + String(pins[i]) + "'\">Port " + String(pins[i]) + " On</button>";
-    html += "<button onclick=\"window.location.href='/off?pin=" + String(pins[i]) + "'\">Port " + String(pins[i]) + " Off</button>";
+    html += "<button onclick=\"sendCommand('/on?pin=" + String(pins[i]) + "')\">Port " + String(pins[i]) + " On</button>";
+    html += "<button onclick=\"sendCommand('/off?pin=" + String(pins[i]) + "')\">Port " + String(pins[i]) + " Off</button>";
     html += "<span id=\"status" + String(pins[i]) + "\">" + (digitalRead(pins[i]) ? " ON" : " OFF") + "</span><br>";
   }
+
+  html += "<script>";
+  html += "function sendCommand(url) {";
+  html += "  var xhr = new XMLHttpRequest();";
+  html += "  xhr.open('GET', url, true);";
+  html += "  xhr.send();";
+  html += "}";
+  html += "</script>";
 
   html += "</body></html>";
   server.send(200, "text/html", html);
@@ -79,6 +87,7 @@ void handleOn() {
   digitalWrite(pin.toInt(), HIGH);
   updateStatus(pin.toInt(), "ON");
   Serial.println("Port " + pin + " turned ON");
+  server.send(200, "text/plain", "ON");
 }
 
 void handleOff() {
@@ -86,6 +95,7 @@ void handleOff() {
   digitalWrite(pin.toInt(), LOW);
   updateStatus(pin.toInt(), "OFF");
   Serial.println("Port " + pin + " turned OFF");
+  server.send(200, "text/plain", "OFF");
 }
 
 void updateStatus(int pin, const char *status) {
